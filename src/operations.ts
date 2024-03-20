@@ -7,6 +7,32 @@ export interface dbos_hello {
   greet_count: number;
 }
 
+interface Customer {
+  username: string;
+  email: string;
+}
+
+interface Production {
+  id: number;
+  title: string;
+  description: string;
+}
+
+interface Performance {
+  id: number;
+  productionId: number;
+  description: string;
+  date: Date;
+  ticketPrice: number;
+  ticketCount: number;
+}
+
+interface Reservation {
+  performanceId: number;
+  seatNumber: number;
+  username: string;
+}
+
 export class Hello {
 
   @GetApi('/greeting/:user') // Serve this function from HTTP GET requests to the /greeting endpoint with 'user' as a path parameter
