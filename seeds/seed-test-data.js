@@ -23,66 +23,87 @@ const performances = [
   { date: new Date('2025-03-16 13:00'), description: 'Final Performance', ticketPrice: 25.00, ticketCount: 10 },
 ]
 
-const soldTickets = [
-  { performanceId: 1, seatNumber: 2, username: 'irene' },
-  { performanceId: 1, seatNumber: 10, username: 'frank' },
-  { performanceId: 1, seatNumber: 6, username: 'bob' },
-  { performanceId: 1, seatNumber: 8, username: 'alice' },
-  { performanceId: 1, seatNumber: 4, username: 'irene' },
-  { performanceId: 3, seatNumber: 8, username: 'alice' },
-  { performanceId: 3, seatNumber: 2, username: 'ethan' },
-  { performanceId: 3, seatNumber: 5, username: 'ethan' },
-  { performanceId: 3, seatNumber: 7, username: 'frank' },
-  { performanceId: 3, seatNumber: 3, username: 'grace' },
-  { performanceId: 3, seatNumber: 1, username: 'ethan' },
-  { performanceId: 4, seatNumber: 10, username: 'bob' },
-  { performanceId: 4, seatNumber: 5, username: 'grace' },
-  { performanceId: 4, seatNumber: 7, username: 'harry' },
-  { performanceId: 4, seatNumber: 3, username: 'irene' },
-  { performanceId: 4, seatNumber: 9, username: 'bob' },
-  { performanceId: 4, seatNumber: 2, username: 'david' },
-  { performanceId: 5, seatNumber: 2, username: 'irene' },
-  { performanceId: 5, seatNumber: 5, username: 'frank' },
-  { performanceId: 5, seatNumber: 10, username: 'alice' },
-  { performanceId: 5, seatNumber: 6, username: 'frank' },
-  { performanceId: 5, seatNumber: 9, username: 'colin' },
-  { performanceId: 5, seatNumber: 1, username: 'harry' },
-  { performanceId: 5, seatNumber: 7, username: 'harry' },
-  { performanceId: 6, seatNumber: 4, username: 'colin' },
-  { performanceId: 6, seatNumber: 8, username: 'frank' },
-  { performanceId: 7, seatNumber: 9, username: 'alice' },
-  { performanceId: 7, seatNumber: 6, username: 'bob' },
-  { performanceId: 7, seatNumber: 7, username: 'jacob' },
-  { performanceId: 7, seatNumber: 8, username: 'colin' },
-  { performanceId: 8, seatNumber: 9, username: 'jacob' },
-  { performanceId: 8, seatNumber: 1, username: 'bob' },
-  { performanceId: 8, seatNumber: 5, username: 'alice' },
-  { performanceId: 9, seatNumber: 7, username: 'harry' },
-  { performanceId: 9, seatNumber: 1, username: 'irene' },
-  { performanceId: 9, seatNumber: 6, username: 'irene' },
-  { performanceId: 9, seatNumber: 8, username: 'frank' },
-  { performanceId: 9, seatNumber: 5, username: 'irene' },
-  { performanceId: 10, seatNumber: 10, username: 'irene' },
-  { performanceId: 10, seatNumber: 1, username: 'david' },
-  { performanceId: 10, seatNumber: 5, username: 'frank' },
-  { performanceId: 10, seatNumber: 6, username: 'ethan' },
-  { performanceId: 10, seatNumber: 7, username: 'david' },
-  { performanceId: 11, seatNumber: 8, username: 'ethan' },
-  { performanceId: 11, seatNumber: 10, username: 'colin' },
-  { performanceId: 11, seatNumber: 7, username: 'colin' },
-  { performanceId: 11, seatNumber: 2, username: 'irene' },
-  { performanceId: 11, seatNumber: 6, username: 'david' },
-  { performanceId: 12, seatNumber: 1, username: 'jacob' },
-  { performanceId: 12, seatNumber: 10, username: 'jacob' },
-  { performanceId: 12, seatNumber: 4, username: 'jacob' },
-  { performanceId: 12, seatNumber: 7, username: 'harry' },
-  { performanceId: 12, seatNumber: 3, username: 'colin' },
-  { performanceId: 12, seatNumber: 6, username: 'jacob' },
-  { performanceId: 12, seatNumber: 9, username: 'ethan' },
-  { performanceId: 12, seatNumber: 8, username: 'frank' },
-  { performanceId: 12, seatNumber: 2, username: 'frank' }
-]
-
+const soldTickets = {
+  "1": [
+    { seatNumber: 2, username: 'irene' },
+    { seatNumber: 10, username: 'frank' },
+    { seatNumber: 6, username: 'bob' },
+    { seatNumber: 8, username: 'alice' },
+    { seatNumber: 4, username: 'irene' },
+  ],
+  "3": [
+    { seatNumber: 8, username: 'alice' },
+    { seatNumber: 2, username: 'ethan' },
+    { seatNumber: 5, username: 'ethan' },
+    { seatNumber: 7, username: 'frank' },
+    { seatNumber: 3, username: 'grace' },
+    { seatNumber: 1, username: 'ethan' },
+  ],
+  "4": [
+    { seatNumber: 10, username: 'bob' },
+    { seatNumber: 5, username: 'grace' },
+    { seatNumber: 7, username: 'harry' },
+    { seatNumber: 3, username: 'irene' },
+    { seatNumber: 9, username: 'bob' },
+    { seatNumber: 2, username: 'david' },
+  ],
+  "5": [
+    { seatNumber: 2, username: 'irene' },
+    { seatNumber: 5, username: 'frank' },
+    { seatNumber: 10, username: 'alice' },
+    { seatNumber: 6, username: 'frank' },
+    { seatNumber: 9, username: 'colin' },
+    { seatNumber: 1, username: 'harry' },
+    { seatNumber: 7, username: 'harry' },
+  ],
+  "6": [
+    { seatNumber: 4, username: 'colin' },
+    { seatNumber: 8, username: 'frank' },
+  ],
+  "7": [
+    { seatNumber: 9, username: 'alice' },
+    { seatNumber: 6, username: 'bob' },
+    { seatNumber: 7, username: 'jacob' },
+    { seatNumber: 8, username: 'colin' },
+  ],
+  "8": [
+    { seatNumber: 9, username: 'jacob' },
+    { seatNumber: 1, username: 'bob' },
+    { seatNumber: 5, username: 'alice' },
+  ],
+  "9": [
+    { seatNumber: 7, username: 'harry' },
+    { seatNumber: 1, username: 'irene' },
+    { seatNumber: 6, username: 'irene' },
+    { seatNumber: 8, username: 'frank' },
+    { seatNumber: 5, username: 'irene' },
+  ],
+  "10": [
+    { seatNumber: 10, username: 'irene' },
+    { seatNumber: 1, username: 'david' },
+    { seatNumber: 5, username: 'frank' },
+    { seatNumber: 6, username: 'ethan' },
+    { seatNumber: 7, username: 'david' },
+  ],
+  "11": [
+    { seatNumber: 8, username: 'ethan' },
+    { seatNumber: 10, username: 'colin' },
+    { seatNumber: 7, username: 'colin' },
+    { seatNumber: 2, username: 'irene' },
+    { seatNumber: 6, username: 'david' },
+  ],
+  "12": [
+    { seatNumber: 1, username: 'jacob' },
+    { seatNumber: 10, username: 'jacob' },
+    { seatNumber: 4, username: 'jacob' },
+    { seatNumber: 7, username: 'harry' },
+    { seatNumber: 3, username: 'colin' },
+    { seatNumber: 6, username: 'jacob' },
+    { seatNumber: 9, username: 'ethan' },
+    { seatNumber: 8, username: 'frank' },
+    { seatNumber: 2, username: 'frank' }
+  ]
+}
 
 const users = [
   "alice",
@@ -114,5 +135,8 @@ exports.seed = async function (knex) {
     await knex('performances').insert(performances.map(p => ({ ...p, productionId })));
   }
 
-  await knex('reservations').insert(soldTickets);
+  for (const [$performanceId, tickets] of Object.entries(soldTickets)) {
+    const performanceId = parseInt($performanceId, 10);
+    await knex('reservations').insert(tickets.map(({ seatNumber, username }) => ({ performanceId, seatNumber, username })));
+  }
 };
