@@ -1,6 +1,5 @@
 import { TestingRuntime, createTestingRuntime } from "@dbos-inc/dbos-sdk";
-import { AvailableTickets, TicketVendor } from "./operations";
-import request from "supertest";
+import { TicketVendor } from "./operations";
 
 describe("operations-test", () => {
   let testRuntime: TestingRuntime;
@@ -56,10 +55,12 @@ describe("operations-test", () => {
     ]);
   });
 
-  test("getAvailableSeats", async () => {
-    const { availableSeats, soldSeats } = await testRuntime.invoke(TicketVendor).getAvailableSeats(1);
-    expect(availableSeats.sort((a, b) => a - b)).toEqual([1, 3, 5, 7, 9]);
-    expect(soldSeats.sort((a, b) => a - b)).toEqual([2, 4, 6, 8, 10]);
+  test("getPerformance", async () => {
+    const performance = await testRuntime.invoke(TicketVendor).getPerformance(1);
+    expect(performance).toEqual(
+      {
+        "id": 1, "productionId": 1, "description": "Opening Night", "date": new Date("2025-03-15T02:00:00.000Z"), "ticketPrice": "25.00", "ticketCount": 10, "soldSeats": [2, 4, 6, 8, 10]
+      });
   });
 
   test("reserveSeats-works", async () => {

@@ -26,16 +26,12 @@ export interface Performance {
 }
 
 export type PerformanceWithSoldTicketCount = Performance & { soldTicketCount: number; };
+export type PerformanceWithSoldTickets = Performance & { soldSeats: number[]; };
 
 export interface Reservation {
   performanceId: number;
   seatNumber: number;
   username: string;
-}
-
-export interface AvailableTickets {
-  availableSeats: number[];
-  soldSeats: number[];
 }
 
 export class TicketVendor {
@@ -98,37 +94,28 @@ export class TicketVendor {
     return results as unknown as PerformanceWithSoldTicketCount[];
   }
 
-  @GetApi('/api/available-seats/:performanceId')
   @Transaction({ readOnly: true })
-  static async getAvailableSeats(ctx: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number): Promise<AvailableTickets> {
-    // get the total ticket count for the performance
+  static async getPerformance(ctx: TransactionContext<Knex>, performanceId: number): Promise<PerformanceWithSoldTickets> {
     const performance = await ctx.client<Performance>('performances')
-      .select('ticketCount')
       .where('id', performanceId)
       .first();
     if (!performance) { throw new Error('Performance not found'); }
 
     // get the seat numbers that are already reserved
     const { ticketCount } = performance;
-    const soldSeats = new Set<number>();
+    const soldSet = new Set<number>();
     const reservations = await ctx.client<Reservation>('reservations')
       .select('seatNumber')
       .where('performanceId', performanceId);
     for (const { seatNumber } of reservations) {
       if (seatNumber > ticketCount) { throw new Error(`Invalid seat number ${seatNumber} of ${ticketCount}`); }
-      if (soldSeats.has(seatNumber)) { throw new Error(`Duplicate seat number ${seatNumber}`); }
-      soldSeats.add(seatNumber);
+      if (soldSet.has(seatNumber)) { throw new Error(`Duplicate seat number ${seatNumber}`); }
+      soldSet.add(seatNumber);
     }
 
-    // return a map of seat numbers to availability
-    const availableSeats = new Array<number>();
-    for (let i = 1; i <= performance.ticketCount; i++) {
-      if (!soldSeats.has(i)) { availableSeats.push(i); }
-    }
-    return {
-      availableSeats,
-      soldSeats: Array.from(soldSeats)
-    };
+    // sort the sold seats array for deterministic testing purposes
+    const soldSeats = Array.from(soldSet).sort((a, b) => a - b);
+    return { ...performance, soldSeats };
   }
 
   // @Workflow()
