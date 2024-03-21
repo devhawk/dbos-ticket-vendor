@@ -20,4 +20,5 @@ for i in {1..30}; do
   sleep 1
 done
 
+docker exec dbos-db psql -U postgres -c "CREATE DATABASE ticket_vendor;"
 echo "Database started successfully!"

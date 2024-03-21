@@ -33,4 +33,5 @@ if %errorlevel% equ 0 (
   )
 :break
 
+docker exec dbos-db psql -U postgres -c "CREATE DATABASE ticket_vendor;"
 echo Database started successfully^!
