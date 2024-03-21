@@ -1,12 +1,12 @@
 import { TestingRuntime, createTestingRuntime } from "@dbos-inc/dbos-sdk";
-import { Hello, dbos_hello } from "./operations";
+import { TicketVendor } from "./operations";
 import request from "supertest";
 
 describe("operations-test", () => {
   let testRuntime: TestingRuntime;
 
   beforeAll(async () => {
-    testRuntime = await createTestingRuntime([Hello]);
+    testRuntime = await createTestingRuntime([TicketVendor]);
   });
 
   afterAll(async () => {
@@ -16,23 +16,40 @@ describe("operations-test", () => {
   /**
    * Test the transaction.
    */
-  test("test-transaction", async () => {
-    const res = await testRuntime.invoke(Hello).helloTransaction("dbos");
-    expect(res).toMatch("Hello, dbos! You have been greeted");
+  // test("test-transaction", async () => {
+  //   const res = await testRuntime.invoke(Hello).helloTransaction("dbos");
+  //   expect(res).toMatch("Hello, dbos! You have been greeted");
 
-    // Check the greet count.
-    const rows = await testRuntime.queryUserDB<dbos_hello>("SELECT * FROM dbos_hello WHERE name=$1", "dbos");
-    expect(rows[0].greet_count).toBe(1);
-  });
+  //   // Check the greet count.
+  //   const rows = await testRuntime.queryUserDB<dbos_hello>("SELECT * FROM dbos_hello WHERE name=$1", "dbos");
+  //   expect(rows[0].greet_count).toBe(1);
+  // });
 
   /**
    * Test the HTTP endpoint.
    */
-  test("test-endpoint", async () => {
+  test("test-productions-endpoint", async () => {
     const res = await request(testRuntime.getHandlersCallback()).get(
-      "/greeting/dbos"
+      "/productions"
     );
     expect(res.statusCode).toBe(200);
-    expect(res.text).toMatch("Hello, dbos! You have been greeted");
+    expect(res.body).toHaveLength(3);
+  });
+
+  test("test-performances-endpoint", async () => {
+    const res = await request(testRuntime.getHandlersCallback()).get(
+      "/performances/1"
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(4);
+  });
+
+  test("test-available-seats-endpoint", async () => {
+    const res = await request(testRuntime.getHandlersCallback()).get(
+      "/available-seats/1"
+    );
+    expect(res.statusCode).toBe(200);
+    // expect(res.body).toHaveLength(4);
   });
 });
+

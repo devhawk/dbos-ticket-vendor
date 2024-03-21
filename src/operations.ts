@@ -33,15 +33,54 @@ interface Reservation {
   username: string;
 }
 
-export class Hello {
+export class TicketVendor {
 
-  @GetApi('/greeting/:user') // Serve this function from HTTP GET requests to the /greeting endpoint with 'user' as a path parameter
-  @Transaction()  // Run this function as a database transaction
-  static async helloTransaction(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) user: string) {
-    // Retrieve and increment the number of times this user has been greeted.
-    const query = "INSERT INTO dbos_hello (name, greet_count) VALUES (?, 1) ON CONFLICT (name) DO UPDATE SET greet_count = dbos_hello.greet_count + 1 RETURNING greet_count;";
-    const { rows } = await ctxt.client.raw(query, [user]) as { rows: dbos_hello[] };
-    const greet_count = rows[0].greet_count;
-    return `Hello, ${user}! You have been greeted ${greet_count} times.\n`;
+  @GetApi('/productions')
+  @Transaction({ readOnly: true })
+  static async getProductions(ctxt: TransactionContext<Knex>): Promise<Production[]> {
+    const query = ctxt.client<Production>('productions');
+    const results = await query;
+    return results;
   }
+
+  @GetApi('/performances/:productionId')
+  @Transaction({ readOnly: true })
+  static async getPerformances(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number) {
+    const query = ctxt.client<Performance & { reservationCount: number }>('performances')
+      .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount', ctxt.client.raw('COUNT(reservations.*)::integer as "soldTicketCount"'))
+      .where('productionId', productionId)
+      .leftJoin<Reservation>('reservations', 'id', 'performanceId')
+      .groupBy('id');
+
+    const results = await query;
+    return results;
+  }
+
+  @GetApi('/available-seats/:performanceId')
+  @Transaction({ readOnly: true })
+  static async getAvailableSeats(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number) {
+    const performance = await ctxt.client<Performance>('performances')
+      .select('ticketCount')
+      .where('id', performanceId)
+      .first();
+    if (!performance) { throw new Error('Performance not found'); }
+
+    const { ticketCount } = performance; 
+    const seatSet = new Set<number>();
+    const reservations = await ctxt.client<Reservation>('reservations')
+      .select('seatNumber')
+      .where('performanceId', performanceId);
+    for (const { seatNumber } of reservations) {
+      if (seatNumber > ticketCount) { throw new Error(`Invalid seat number ${seatNumber} of ${ticketCount}`); }
+      seatSet.add(seatNumber);
+    }
+
+    const seatMap = new Map<number, boolean>();
+    for (let i = 1; i <= performance.ticketCount; i++) { 
+      seatMap.set(i, !seatSet.has(i));
+    }
+
+    return Object.fromEntries(seatMap);
+  }
+
 }
