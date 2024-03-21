@@ -1,7 +1,3 @@
-// use a pseudo random number generator for reproducibility
-const seedrandom = require('seedrandom');
-const rng = seedrandom('seed');
-
 const productions = [
   {
     "id": 1,
@@ -26,6 +22,67 @@ const performances = [
   { date: new Date('2025-03-15 19:00'), description: 'Saturday Night', ticketPrice: 25.00, ticketCount: 10 },
   { date: new Date('2025-03-16 13:00'), description: 'Final Performance', ticketPrice: 25.00, ticketCount: 10 },
 ]
+
+const soldTickets = [
+  { performanceId: 1, seatNumber: 2, username: 'irene' },
+  { performanceId: 1, seatNumber: 10, username: 'frank' },
+  { performanceId: 1, seatNumber: 6, username: 'bob' },
+  { performanceId: 1, seatNumber: 8, username: 'alice' },
+  { performanceId: 1, seatNumber: 4, username: 'irene' },
+  { performanceId: 3, seatNumber: 8, username: 'alice' },
+  { performanceId: 3, seatNumber: 2, username: 'ethan' },
+  { performanceId: 3, seatNumber: 5, username: 'ethan' },
+  { performanceId: 3, seatNumber: 7, username: 'frank' },
+  { performanceId: 3, seatNumber: 3, username: 'grace' },
+  { performanceId: 3, seatNumber: 1, username: 'ethan' },
+  { performanceId: 4, seatNumber: 10, username: 'bob' },
+  { performanceId: 4, seatNumber: 5, username: 'grace' },
+  { performanceId: 4, seatNumber: 7, username: 'harry' },
+  { performanceId: 4, seatNumber: 3, username: 'irene' },
+  { performanceId: 4, seatNumber: 9, username: 'bob' },
+  { performanceId: 4, seatNumber: 2, username: 'david' },
+  { performanceId: 5, seatNumber: 2, username: 'irene' },
+  { performanceId: 5, seatNumber: 5, username: 'frank' },
+  { performanceId: 5, seatNumber: 10, username: 'alice' },
+  { performanceId: 5, seatNumber: 6, username: 'frank' },
+  { performanceId: 5, seatNumber: 9, username: 'colin' },
+  { performanceId: 5, seatNumber: 1, username: 'harry' },
+  { performanceId: 5, seatNumber: 7, username: 'harry' },
+  { performanceId: 6, seatNumber: 4, username: 'colin' },
+  { performanceId: 6, seatNumber: 8, username: 'frank' },
+  { performanceId: 7, seatNumber: 9, username: 'alice' },
+  { performanceId: 7, seatNumber: 6, username: 'bob' },
+  { performanceId: 7, seatNumber: 7, username: 'jacob' },
+  { performanceId: 7, seatNumber: 8, username: 'colin' },
+  { performanceId: 8, seatNumber: 9, username: 'jacob' },
+  { performanceId: 8, seatNumber: 1, username: 'bob' },
+  { performanceId: 8, seatNumber: 5, username: 'alice' },
+  { performanceId: 9, seatNumber: 7, username: 'harry' },
+  { performanceId: 9, seatNumber: 1, username: 'irene' },
+  { performanceId: 9, seatNumber: 6, username: 'irene' },
+  { performanceId: 9, seatNumber: 8, username: 'frank' },
+  { performanceId: 9, seatNumber: 5, username: 'irene' },
+  { performanceId: 10, seatNumber: 10, username: 'irene' },
+  { performanceId: 10, seatNumber: 1, username: 'david' },
+  { performanceId: 10, seatNumber: 5, username: 'frank' },
+  { performanceId: 10, seatNumber: 6, username: 'ethan' },
+  { performanceId: 10, seatNumber: 7, username: 'david' },
+  { performanceId: 11, seatNumber: 8, username: 'ethan' },
+  { performanceId: 11, seatNumber: 10, username: 'colin' },
+  { performanceId: 11, seatNumber: 7, username: 'colin' },
+  { performanceId: 11, seatNumber: 2, username: 'irene' },
+  { performanceId: 11, seatNumber: 6, username: 'david' },
+  { performanceId: 12, seatNumber: 1, username: 'jacob' },
+  { performanceId: 12, seatNumber: 10, username: 'jacob' },
+  { performanceId: 12, seatNumber: 4, username: 'jacob' },
+  { performanceId: 12, seatNumber: 7, username: 'harry' },
+  { performanceId: 12, seatNumber: 3, username: 'colin' },
+  { performanceId: 12, seatNumber: 6, username: 'jacob' },
+  { performanceId: 12, seatNumber: 9, username: 'ethan' },
+  { performanceId: 12, seatNumber: 8, username: 'frank' },
+  { performanceId: 12, seatNumber: 2, username: 'frank' }
+]
+
 
 const users = [
   "alice",
@@ -53,25 +110,9 @@ exports.seed = async function (knex) {
   await knex('customers').insert(users.map(username => ({ username, password })));
   await knex('productions').insert(productions);
 
-  for (const { id } of productions) {
-    for (const perf of performances) {
-      const performanceIds = await knex('performances').insert({ productionId: id, ...perf }, 'id');
-      if (performanceIds.length !== 1) { throw new Error(`Expected exactly one performance ID not ${performanceIds.length}`); }
-      const performanceId = performanceIds[0].id;
-
-      const seatSet = new Set();
-      const soldTicketCount = Math.floor(rng() * perf.ticketCount);
-      for (let i = 0; i < soldTicketCount; i++) {
-        const username = users[Math.floor(rng() * users.length)];
-        while (true) {
-          const seatNumber = Math.floor(rng() * perf.ticketCount) + 1;
-          if (!seatSet.has(seatNumber)) {
-            seatSet.add(seatNumber);
-            await knex('reservations').insert({ performanceId, username, seatNumber });
-            break;
-          }
-        }
-      }
-    }
+  for (const { id: productionId } of productions) {
+    await knex('performances').insert(performances.map(p => ({ ...p, productionId })));
   }
+
+  await knex('reservations').insert(soldTickets);
 };
