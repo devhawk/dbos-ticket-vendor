@@ -8,9 +8,10 @@
     "lint-fix": "eslint --fix src"
   },
   "devDependencies": {
+    "@dbos-inc/communicator-bcrypt": "^1.1.14",
     "@dbos-inc/dbos-cloud": "^1.1.14",
     "@dbos-inc/eslint-plugin": "^0.0.6",
-    "@dbos-inc/communicator-bcrypt": "^1.1.14",
+    "@dbos-inc/dbos-openapi": "^1.1.14",
     "@types/jest": "^29.5.12",
     "@types/seedrandom": "^3.0.8",
     "@types/supertest": "^6.0.2",
