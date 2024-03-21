@@ -80,7 +80,7 @@ export class TicketVendor {
       .groupBy('id');
 
     const results = await query;
-    // Knex type inference logic doesn't handle the raw COUNT() expression, so we need to cast the results. 
+    // Knex type inference logic doesn't handle the raw COUNT() expression, so explicitly cast the results 
     return results as unknown as PerformanceWithSoldTicketCount[];
   }
 
@@ -120,13 +120,13 @@ export class TicketVendor {
   // @Workflow()
   // static async purchaseTickets(ctxt: WorkflowContext, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
   //   const _availability = await ctxt.invoke(TicketVendor).getAvailableSeats(performanceId);
-   
+
 
   // }
 
   @Transaction()
-  static async reserveSeats(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
+  static async reserveSeats(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
     await ctxt.client<Reservation>('reservations')
-      .insert(seatNumbers.map(seatNumber => ({ performanceId, username, seatNumber })));
+      .insert(seats.map(seatNumber => ({ performanceId, username, seatNumber })));
   }
 }
