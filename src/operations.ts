@@ -2,18 +2,18 @@ import { TransactionContext, Transaction, GetApi, ArgSource, ArgSources, PostApi
 import { BcryptCommunicator } from '@dbos-inc/communicator-bcrypt';
 import { Knex } from 'knex';
 
-interface Customer {
+export interface Customer {
   username: string;
   password: string;
 }
 
-interface Production {
+export interface Production {
   id: number;
   title: string;
   description: string;
 }
 
-interface Performance {
+export interface Performance {
   id: number;
   productionId: number;
   description: string;
@@ -22,15 +22,15 @@ interface Performance {
   ticketCount: number;
 }
 
-type PerformanceWithSoldTicketCount = Performance & { soldTicketCount: number; };
+export type PerformanceWithSoldTicketCount = Performance & { soldTicketCount: number; };
 
-interface Reservation {
+export interface Reservation {
   performanceId: number;
   seatNumber: number;
   username: string;
 }
 
-interface AvailableTickets {
+export interface AvailableTickets {
   availableSeats: number[];
   soldSeats: number[];
 }
@@ -128,5 +128,14 @@ export class TicketVendor {
   static async reserveSeats(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
     await ctxt.client<Reservation>('reservations')
       .insert(seats.map(seatNumber => ({ performanceId, username, seatNumber })));
+  }
+
+  @Transaction()
+  static async deleteReservation(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
+    await ctxt.client<Reservation>('reservations')
+      .delete()
+      .where('performanceId', performanceId)
+      .andWhere('username', username)
+      .andWhere('seatNumber', 'in', seats);
   }
 }

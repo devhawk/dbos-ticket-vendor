@@ -1,5 +1,5 @@
 import { TestingRuntime, createTestingRuntime } from "@dbos-inc/dbos-sdk";
-import { TicketVendor } from "./operations";
+import { AvailableTickets, TicketVendor } from "./operations";
 import request from "supertest";
 
 describe("operations-test", () => {
@@ -58,23 +58,50 @@ describe("operations-test", () => {
       "/api/available-seats/1"
     );
     expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual({
-      "availableSeats": [1, 3, 5, 7, 9],
-      "soldSeats": [2, 10, 6, 8, 4]
-    });
+    const { availableSeats, soldSeats } = res.body as AvailableTickets;
+    expect(availableSeats.sort((a, b) => a - b)).toEqual([1, 3, 5, 7, 9]);
+    expect(soldSeats.sort((a, b) => a - b)).toEqual([2, 4, 6, 8, 10]);
   });
 
   test("reserve-seats-works", async () => {
+    const performanceId = 1;
+    const username = 'kate';
+    const seats = [1, 3, 5];
+
     try {
-      await testRuntime.invoke(TicketVendor).reserveSeats(1, "kate", [1, 3, 5]);
+      await testRuntime.invoke(TicketVendor).reserveSeats(performanceId, username, seats);
     } finally {
-      await testRuntime.queryUserDB('DELETE FROM reservations WHERE username = $1', 'kate');
+      await testRuntime.queryUserDB('DELETE FROM reservations WHERE username = $1', username);
     }
   })
 
   test("reserve-seats-fails", async () => {
     expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'kate', [1, 2, 3, 5])).rejects.toThrow();
     expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'invalid', [1, 3, 5])).rejects.toThrow();
+  })
+
+  test("delete-seats-works", async () => {
+    const performanceId = 1;
+    const username = 'irene';
+    const seats = [2, 4];
+    const query = 'select * from reservations where "performanceId" = $1 and username = $2';
+
+    try {
+      const before = await testRuntime.queryUserDB(query, performanceId, username);
+      expect(before).toHaveLength(2);
+
+      await testRuntime.invoke(TicketVendor).deleteReservation(performanceId, username, seats);
+
+      const after = await testRuntime.queryUserDB(query, performanceId, username);
+      expect(after).toHaveLength(0);
+    } finally {
+      for (const seat of seats) {
+        await testRuntime.queryUserDB(`
+          INSERT INTO reservations ("performanceId", "seatNumber", username)
+          VALUES ($1, $2, $3)`,
+          performanceId, seat, username);
+      }
+    }
   })
 });
 
