@@ -14,9 +14,9 @@
     "db:reset": "npm run db:rollback && npm run db:migrate && npm run db:seed"
   },
   "devDependencies": {
-    "@dbos-inc/communicator-bcrypt": "^1.1.14",
-    "@dbos-inc/dbos-cloud": "^1.1.14",
-    "@dbos-inc/dbos-openapi": "^1.1.14",
+    "@dbos-inc/communicator-bcrypt": "^1.1.15",
+    "@dbos-inc/dbos-cloud": "^1.1.15",
+    "@dbos-inc/dbos-openapi": "^1.1.15",
     "@dbos-inc/eslint-plugin": "^0.0.6",
     "@types/jest": "^29.5.12",
     "@types/seedrandom": "^3.0.8",
@@ -26,11 +26,11 @@
     "seedrandom": "^3.0.5",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.2",
-    "typescript": "~5.3.3"
+    "typescript": "~5.4.3"
   },
   "dependencies": {
-    "@dbos-inc/dbos-sdk": "^1.1.14",
+    "@dbos-inc/dbos-sdk": "^1.1.15",
     "knex": "^3.1.0",
-    "liquidjs": "^10.10.1"
+    "liquidjs": "^10.10.2"
   }
 }

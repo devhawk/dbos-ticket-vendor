@@ -1,4 +1,4 @@
-import { GetApi, HandlerContext } from "@dbos-inc/dbos-sdk";
+import { ArgSource, ArgSources, GetApi, HandlerContext } from "@dbos-inc/dbos-sdk";
 import { Liquid } from "liquidjs";
 import { TicketVendor } from "./operations";
 import path from 'path';
@@ -21,7 +21,7 @@ export class Frontend {
     }
 
     @GetApi('/production/:id')
-    static async production(ctx: HandlerContext, id: number) {
+    static async production(ctx: HandlerContext, @ArgSource(ArgSources.URL) id: number) {
         const production = await ctx.invoke(TicketVendor).getProduction(id);
         const performances = await ctx.invoke(TicketVendor).getPerformances(id);
         return await render("production", { production, performances });
