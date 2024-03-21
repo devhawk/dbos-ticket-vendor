@@ -23,7 +23,7 @@ const productions = [
 const performances = [
   { date: new Date('2025-03-14 19:00'), description: 'Opening Night', ticketPrice: 25.00, ticketCount: 10 },
   { date: new Date('2025-03-15 13:00'), description: 'Saturday Matinee', ticketPrice: 25.00, ticketCount: 10 },
-  { date: new Date('2025-03-15 19:00'), description: 'Saturaday Night', ticketPrice: 25.00, ticketCount: 10 },
+  { date: new Date('2025-03-15 19:00'), description: 'Saturday Night', ticketPrice: 25.00, ticketCount: 10 },
   { date: new Date('2025-03-16 13:00'), description: 'Final Performance', ticketPrice: 25.00, ticketCount: 10 },
 ]
 

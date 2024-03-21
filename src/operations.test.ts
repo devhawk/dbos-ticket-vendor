@@ -63,7 +63,7 @@ describe("operations-test", () => {
     expect(res.body).toStrictEqual([
       { "id": 1, "productionId": 1, "description": "Opening Night", "date": "2025-03-14T07:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 5 },
       { "id": 2, "productionId": 1, "description": "Saturday Matinee", "date": "2025-03-15T07:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 0 },
-      { "id": 3, "productionId": 1, "description": "Saturaday Night", "date": "2025-03-15T07:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 },
+      { "id": 3, "productionId": 1, "description": "Saturday Night", "date": "2025-03-15T07:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 },
       { "id": 4, "productionId": 1, "description": "Final Performance", "date": "2025-03-16T07:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 }
     ]);
   });
