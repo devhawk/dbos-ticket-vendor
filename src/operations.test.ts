@@ -19,12 +19,9 @@ describe("operations-test", () => {
     expect(() => testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password')).rejects.toThrow();
   });
 
-  test("test-productions-endpoint", async () => {
-    const res = await request(testRuntime.getHandlersCallback()).get(
-      "/api/productions"
-    );
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual([
+  test("getProductions", async () => {
+    const productions = await testRuntime.invoke(TicketVendor).getProductions();
+    expect(productions).toStrictEqual([
       {
         "id": 1, "name": "Starship Sonata",
         "description": "An epic space opera musical featuring rival starship captains vying for control of the galaxy, with catchy tunes and futuristic dance numbers."
@@ -40,42 +37,32 @@ describe("operations-test", () => {
     ]);
   });
 
-  test("test-production-endpoint", async () => {
-    const res = await request(testRuntime.getHandlersCallback()).get(
-      "/api/production/1"
-    );
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual(
+  test("getProduction", async () => {
+    const production = await testRuntime.invoke(TicketVendor).getProduction(1);
+    expect(production).toStrictEqual(
       {
         "id": 1, "name": "Starship Sonata",
         "description": "An epic space opera musical featuring rival starship captains vying for control of the galaxy, with catchy tunes and futuristic dance numbers."
       });
   });
 
-  test("test-performances-endpoint", async () => {
-    const res = await request(testRuntime.getHandlersCallback()).get(
-      "/api/performances/1"
-    );
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual([
-      { "id": 1, "productionId": 1, "description": "Opening Night", "date": "2025-03-15T02:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 5 },
-      { "id": 2, "productionId": 1, "description": "Saturday Matinee", "date": "2025-03-15T20:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 0 },
-      { "id": 3, "productionId": 1, "description": "Saturday Night", "date": "2025-03-16T02:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 },
-      { "id": 4, "productionId": 1, "description": "Final Performance", "date": "2025-03-16T20:00:00.000Z", "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 }
+  test("getPerformances", async () => {
+    const performances = await testRuntime.invoke(TicketVendor).getPerformances(1);
+    expect(performances).toStrictEqual([
+      { "id": 1, "productionId": 1, "description": "Opening Night", "date": new Date("2025-03-15T02:00:00.000Z"), "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 5 },
+      { "id": 2, "productionId": 1, "description": "Saturday Matinee", "date": new Date("2025-03-15T20:00:00.000Z"), "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 0 },
+      { "id": 3, "productionId": 1, "description": "Saturday Night", "date": new Date("2025-03-16T02:00:00.000Z"), "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 },
+      { "id": 4, "productionId": 1, "description": "Final Performance", "date": new Date("2025-03-16T20:00:00.000Z"), "ticketPrice": "25.00", "ticketCount": 10, "soldTicketCount": 6 }
     ]);
   });
 
-  test("test-available-seats-endpoint", async () => {
-    const res = await request(testRuntime.getHandlersCallback()).get(
-      "/api/available-seats/1"
-    );
-    expect(res.statusCode).toBe(200);
-    const { availableSeats, soldSeats } = res.body as AvailableTickets;
+  test("getAvailableSeats", async () => {
+    const { availableSeats, soldSeats } = await testRuntime.invoke(TicketVendor).getAvailableSeats(1);
     expect(availableSeats.sort((a, b) => a - b)).toEqual([1, 3, 5, 7, 9]);
     expect(soldSeats.sort((a, b) => a - b)).toEqual([2, 4, 6, 8, 10]);
   });
 
-  test("reserve-seats-works", async () => {
+  test("reserveSeats-works", async () => {
     const performanceId = 1;
     const username = 'kate';
     const seats = [1, 3, 5];
@@ -87,7 +74,7 @@ describe("operations-test", () => {
     }
   })
 
-  test("reserve-seats-fails", async () => {
+  test("reserveSeats-fails", async () => {
     expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'kate', [1, 2, 3, 5])).rejects.toThrow();
     expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'invalid', [1, 3, 5])).rejects.toThrow();
   })
