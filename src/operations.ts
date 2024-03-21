@@ -1,6 +1,9 @@
 import { TransactionContext, Transaction, GetApi, ArgSource, ArgSources, PostApi, WorkflowContext, DBOSResponseError, Workflow } from '@dbos-inc/dbos-sdk';
 import { BcryptCommunicator } from '@dbos-inc/communicator-bcrypt';
 import { Knex } from 'knex';
+import { Frontend } from './frontend';
+
+export { Frontend };
 
 export interface Customer {
   username: string;
@@ -9,7 +12,7 @@ export interface Customer {
 
 export interface Production {
   id: number;
-  title: string;
+  name: string;
   description: string;
 }
 
@@ -68,6 +71,16 @@ export class TicketVendor {
     const query = ctx.client<Production>('productions');
     const results = await query;
     return results;
+  }
+
+  @Transaction({ readOnly: true })
+  static async getProduction(ctx: TransactionContext<Knex>, id: number): Promise<Production> {
+    const query = ctx.client<Production>('productions')
+      .where('id', id)
+      .first();
+    const result = await query;
+    if (!result) { throw new DBOSResponseError('Production not found', 404); }
+    return result;
   }
 
   @GetApi('/api/performances/:productionId')

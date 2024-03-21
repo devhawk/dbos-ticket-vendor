@@ -1,0 +1,10 @@
+<html>
+<body>
+<h1>Productions</h1>
+<ul>
+{% for production in productions %}
+    <li><a href="/production/{{production.id}}">{{ production.name }}</a></li>
+{% endfor %}
+</ul>
+</body>
+</html>

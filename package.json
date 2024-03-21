@@ -4,9 +4,10 @@
   "scripts": {
     "build": "tsc",
     "openapi": "npx dbos-openapi generate src/operations.ts",
-    "test": "npx knex migrate:rollback && npx knex migrate:up && jest",
+    "test": "jest --randomize",
     "lint": "eslint src",
-    "lint-fix": "eslint --fix src"
+    "lint-fix": "eslint --fix src",
+    "start": "tsc && npx dbos-sdk start"
   },
   "devDependencies": {
     "@dbos-inc/communicator-bcrypt": "^1.1.14",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "@dbos-inc/dbos-sdk": "^1.1.14",
-    "knex": "^3.1.0"
+    "knex": "^3.1.0",
+    "liquidjs": "^10.10.1"
   }
 }
