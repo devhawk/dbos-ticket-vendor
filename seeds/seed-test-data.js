@@ -61,14 +61,12 @@ exports.seed = async function (knex) {
 
       const seatSet = new Set();
       const soldTicketCount = Math.floor(rng() * perf.ticketCount);
-      console.log(`Performance ${performanceId} for production ${id} has ${soldTicketCount} sold tickets`);
       for (let i = 0; i < soldTicketCount; i++) {
         const username = users[Math.floor(rng() * users.length)];
         while (true) {
           const seatNumber = Math.floor(rng() * perf.ticketCount) + 1;
           if (!seatSet.has(seatNumber)) {
             seatSet.add(seatNumber);
-            console.log(`Reserving seat ${seatNumber} of ${performanceId} for ${username}`);
             await knex('reservations').insert({ performanceId, username, seatNumber });
             break;
           }
