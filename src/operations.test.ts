@@ -73,7 +73,9 @@ describe("operations-test", () => {
       "/api/available-seats/1"
     );
     expect(res.statusCode).toBe(200);
-    expect(res.body).toStrictEqual({ 1: true, 2: false, 3: true, 4: false, 5: true, 6: false, 7: true, 8: false, 9: true, 10: false });
+    expect(res.body).toStrictEqual({
+      "availableSeats":[1,3,5,7,9],
+      "soldSeats":[2,10,6,8,4]});
   });
 });
 

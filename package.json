@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "tsc",
+    "openapi": "npx dbos-openapi generate src/operations.ts",
     "test": "npx knex migrate:rollback && npx knex migrate:up && jest",
     "lint": "eslint src",
     "lint-fix": "eslint --fix src"
@@ -10,8 +11,8 @@
   "devDependencies": {
     "@dbos-inc/communicator-bcrypt": "^1.1.14",
     "@dbos-inc/dbos-cloud": "^1.1.14",
-    "@dbos-inc/eslint-plugin": "^0.0.6",
     "@dbos-inc/dbos-openapi": "^1.1.14",
+    "@dbos-inc/eslint-plugin": "^0.0.6",
     "@types/jest": "^29.5.12",
     "@types/seedrandom": "^3.0.8",
     "@types/supertest": "^6.0.2",

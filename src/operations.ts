@@ -22,10 +22,17 @@ interface Performance {
   ticketCount: number;
 }
 
+type PerformanceWithSoldTicketCount = Performance & { soldTicketCount: number; };
+
 interface Reservation {
   performanceId: number;
   seatNumber: number;
   username: string;
+}
+
+interface AvailableTickets {
+  availableSeats: number[];
+  soldSeats: number[];
 }
 
 export class TicketVendor {
@@ -55,7 +62,6 @@ export class TicketVendor {
     await ctxt.client<Customer>('customers').insert({ username, password: hashedPassword });
   }
 
-
   @GetApi('/api/productions')
   @Transaction({ readOnly: true })
   static async getProductions(ctxt: TransactionContext<Knex>): Promise<Production[]> {
@@ -66,20 +72,21 @@ export class TicketVendor {
 
   @GetApi('/api/performances/:productionId')
   @Transaction({ readOnly: true })
-  static async getPerformances(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number) {
-    const query = ctxt.client<Performance & { reservationCount: number }>('performances')
+  static async getPerformances(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number): Promise<PerformanceWithSoldTicketCount[]> {
+    const query = ctxt.client<Performance>('performances')
       .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount', ctxt.client.raw('COUNT(reservations.*)::integer as "soldTicketCount"'))
       .where('productionId', productionId)
       .leftJoin<Reservation>('reservations', 'id', 'performanceId')
       .groupBy('id');
 
     const results = await query;
-    return results;
+    // Knex type inference logic doesn't handle the raw COUNT() expression, so we need to cast the results. 
+    return results as unknown as PerformanceWithSoldTicketCount[];
   }
 
   @GetApi('/api/available-seats/:performanceId')
   @Transaction({ readOnly: true })
-  static async getAvailableSeats(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number) {
+  static async getAvailableSeats(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number): Promise<AvailableTickets> {
     // get the total ticket count for the performance
     const performance = await ctxt.client<Performance>('performances')
       .select('ticketCount')
@@ -88,22 +95,25 @@ export class TicketVendor {
     if (!performance) { throw new Error('Performance not found'); }
 
     // get the seat numbers that are already reserved
-    const { ticketCount } = performance; 
-    const seatSet = new Set<number>();
+    const { ticketCount } = performance;
+    const soldSeats = new Set<number>();
     const reservations = await ctxt.client<Reservation>('reservations')
       .select('seatNumber')
       .where('performanceId', performanceId);
     for (const { seatNumber } of reservations) {
       if (seatNumber > ticketCount) { throw new Error(`Invalid seat number ${seatNumber} of ${ticketCount}`); }
-      if (seatSet.has(seatNumber)) { throw new Error(`Duplicate seat number ${seatNumber}`); }
-      seatSet.add(seatNumber);
+      if (soldSeats.has(seatNumber)) { throw new Error(`Duplicate seat number ${seatNumber}`); }
+      soldSeats.add(seatNumber);
     }
 
     // return a map of seat numbers to availability
-    const seatMap = new Map<number, boolean>();
-    for (let i = 1; i <= performance.ticketCount; i++) { 
-      seatMap.set(i, !seatSet.has(i));
+    const availableSeats = new Array<number>();
+    for (let i = 1; i <= performance.ticketCount; i++) {
+      if (!soldSeats.has(i)) { availableSeats.push(i); }
     }
-    return Object.fromEntries(seatMap);
+    return {
+      availableSeats,
+      soldSeats: Array.from(soldSeats)
+    };
   }
 }
