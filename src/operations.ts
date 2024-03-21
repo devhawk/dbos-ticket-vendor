@@ -39,8 +39,8 @@ export class TicketVendor {
 
   @PostApi('/api/login')
   @Transaction({ readOnly: true })
-  static async login(ctxt: TransactionContext<Knex>, username: string, password: string): Promise<void> {
-    const user = await ctxt.client<Customer>('customers').select("password").where({ username }).first();
+  static async login(ctx: TransactionContext<Knex>, username: string, password: string): Promise<void> {
+    const user = await ctx.client<Customer>('customers').select("password").where({ username }).first();
     if (!(user && await BcryptCommunicator.bcryptCompare(password, user.password))) {
       throw new DBOSResponseError("Invalid username or password", 400);
     }
@@ -48,33 +48,33 @@ export class TicketVendor {
 
   @PostApi('/api/register')
   @Workflow()
-  static async register(ctxt: WorkflowContext, username: string, password: string): Promise<void> {
-    const hashedPassword = await ctxt.invoke(BcryptCommunicator).bcryptHash(password, 10);
-    await ctxt.invoke(TicketVendor).saveNewUser(username, hashedPassword);
+  static async register(ctx: WorkflowContext, username: string, password: string): Promise<void> {
+    const hashedPassword = await ctx.invoke(BcryptCommunicator).bcryptHash(password, 10);
+    await ctx.invoke(TicketVendor).saveNewUser(username, hashedPassword);
   }
 
   @Transaction()
-  static async saveNewUser(ctxt: TransactionContext<Knex>, username: string, hashedPassword: string): Promise<void> {
-    const user = await ctxt.client<Customer>('customers').select().where({ username }).first();
+  static async saveNewUser(ctx: TransactionContext<Knex>, username: string, hashedPassword: string): Promise<void> {
+    const user = await ctx.client<Customer>('customers').select().where({ username }).first();
     if (user) {
       throw new DBOSResponseError("Username already exists", 400);
     }
-    await ctxt.client<Customer>('customers').insert({ username, password: hashedPassword });
+    await ctx.client<Customer>('customers').insert({ username, password: hashedPassword });
   }
 
   @GetApi('/api/productions')
   @Transaction({ readOnly: true })
-  static async getProductions(ctxt: TransactionContext<Knex>): Promise<Production[]> {
-    const query = ctxt.client<Production>('productions');
+  static async getProductions(ctx: TransactionContext<Knex>): Promise<Production[]> {
+    const query = ctx.client<Production>('productions');
     const results = await query;
     return results;
   }
 
   @GetApi('/api/performances/:productionId')
   @Transaction({ readOnly: true })
-  static async getPerformances(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number): Promise<PerformanceWithSoldTicketCount[]> {
-    const query = ctxt.client<Performance>('performances')
-      .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount', ctxt.client.raw('COUNT(reservations.*)::integer as "soldTicketCount"'))
+  static async getPerformances(ctx: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number): Promise<PerformanceWithSoldTicketCount[]> {
+    const query = ctx.client<Performance>('performances')
+      .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount', ctx.client.raw('COUNT(reservations.*)::integer as "soldTicketCount"'))
       .where('productionId', productionId)
       .leftJoin<Reservation>('reservations', 'id', 'performanceId')
       .groupBy('id');
@@ -86,9 +86,9 @@ export class TicketVendor {
 
   @GetApi('/api/available-seats/:performanceId')
   @Transaction({ readOnly: true })
-  static async getAvailableSeats(ctxt: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number): Promise<AvailableTickets> {
+  static async getAvailableSeats(ctx: TransactionContext<Knex>, @ArgSource(ArgSources.URL) performanceId: number): Promise<AvailableTickets> {
     // get the total ticket count for the performance
-    const performance = await ctxt.client<Performance>('performances')
+    const performance = await ctx.client<Performance>('performances')
       .select('ticketCount')
       .where('id', performanceId)
       .first();
@@ -97,7 +97,7 @@ export class TicketVendor {
     // get the seat numbers that are already reserved
     const { ticketCount } = performance;
     const soldSeats = new Set<number>();
-    const reservations = await ctxt.client<Reservation>('reservations')
+    const reservations = await ctx.client<Reservation>('reservations')
       .select('seatNumber')
       .where('performanceId', performanceId);
     for (const { seatNumber } of reservations) {
@@ -118,21 +118,21 @@ export class TicketVendor {
   }
 
   // @Workflow()
-  // static async purchaseTickets(ctxt: WorkflowContext, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
-  //   const _availability = await ctxt.invoke(TicketVendor).getAvailableSeats(performanceId);
+  // static async purchaseTickets(ctx: WorkflowContext, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
+  //   const _availability = await ctx.invoke(TicketVendor).getAvailableSeats(performanceId);
 
 
   // }
 
   @Transaction()
-  static async reserveSeats(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
-    await ctxt.client<Reservation>('reservations')
+  static async reserveSeats(ctx: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
+    await ctx.client<Reservation>('reservations')
       .insert(seats.map(seatNumber => ({ performanceId, username, seatNumber })));
   }
 
   @Transaction()
-  static async deleteReservation(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
-    await ctxt.client<Reservation>('reservations')
+  static async deleteReservation(ctx: TransactionContext<Knex>, performanceId: number, username: string, seats: ReadonlyArray<number>): Promise<void> {
+    await ctx.client<Reservation>('reservations')
       .delete()
       .where('performanceId', performanceId)
       .andWhere('username', username)
