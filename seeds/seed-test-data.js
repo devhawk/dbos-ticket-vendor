@@ -94,14 +94,15 @@ const soldTickets = {
   ],
   "12": [
     { seatNumber: 1, username: 'jacob' },
-    { seatNumber: 10, username: 'jacob' },
-    { seatNumber: 4, username: 'jacob' },
-    { seatNumber: 7, username: 'harry' },
+    { seatNumber: 2, username: 'frank' },
     { seatNumber: 3, username: 'colin' },
+    { seatNumber: 4, username: 'jacob' },
+    { seatNumber: 5, username: 'jacob' },
     { seatNumber: 6, username: 'jacob' },
-    { seatNumber: 9, username: 'ethan' },
+    { seatNumber: 7, username: 'harry' },
     { seatNumber: 8, username: 'frank' },
-    { seatNumber: 2, username: 'frank' }
+    { seatNumber: 9, username: 'ethan' },
+    { seatNumber: 10, username: 'jacob' },
   ]
 }
 
