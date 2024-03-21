@@ -116,4 +116,17 @@ export class TicketVendor {
       soldSeats: Array.from(soldSeats)
     };
   }
+
+  // @Workflow()
+  // static async purchaseTickets(ctxt: WorkflowContext, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
+  //   const _availability = await ctxt.invoke(TicketVendor).getAvailableSeats(performanceId);
+   
+
+  // }
+
+  @Transaction()
+  static async reserveSeats(ctxt: TransactionContext<Knex>, performanceId: number, username: string, seatNumbers: ReadonlyArray<number>): Promise<void> {
+    await ctxt.client<Reservation>('reservations')
+      .insert(seatNumbers.map(seatNumber => ({ performanceId, username, seatNumber })));
+  }
 }

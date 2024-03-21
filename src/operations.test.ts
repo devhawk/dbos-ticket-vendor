@@ -19,21 +19,6 @@ describe("operations-test", () => {
     expect(() => testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password')).rejects.toThrow();
   });
 
-  /**
-   * Test the transaction.
-   */
-  // test("test-transaction", async () => {
-  //   const res = await testRuntime.invoke(Hello).helloTransaction("dbos");
-  //   expect(res).toMatch("Hello, dbos! You have been greeted");
-
-  //   // Check the greet count.
-  //   const rows = await testRuntime.queryUserDB<dbos_hello>("SELECT * FROM dbos_hello WHERE name=$1", "dbos");
-  //   expect(rows[0].greet_count).toBe(1);
-  // });
-
-  /**
-   * Test the HTTP endpoint.
-   */
   test("test-productions-endpoint", async () => {
     const res = await request(testRuntime.getHandlersCallback()).get(
       "/api/productions"
@@ -74,8 +59,22 @@ describe("operations-test", () => {
     );
     expect(res.statusCode).toBe(200);
     expect(res.body).toStrictEqual({
-      "availableSeats":[1,3,5,7,9],
-      "soldSeats":[2,10,6,8,4]});
+      "availableSeats": [1, 3, 5, 7, 9],
+      "soldSeats": [2, 10, 6, 8, 4]
+    });
   });
+
+  test("reserve-seats-works", async () => {
+    try {
+      await testRuntime.invoke(TicketVendor).reserveSeats(1, "kate", [1, 3, 5]);
+    } finally {
+      await testRuntime.queryUserDB('DELETE FROM reservations WHERE username = $1', 'kate');
+    }
+  })
+
+  test("reserve-seats-fails", async () => {
+    expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'kate', [1, 2, 3, 5])).rejects.toThrow();
+    expect(() => testRuntime.invoke(TicketVendor).reserveSeats(1, 'invalid', [1, 3, 5])).rejects.toThrow();
+  })
 });
 
