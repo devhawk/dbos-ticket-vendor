@@ -73,6 +73,7 @@ export class TicketVendor {
     return results;
   }
 
+  @GetApi('/api/production/:id')
   @Transaction({ readOnly: true })
   static async getProduction(ctx: TransactionContext<Knex>, id: number): Promise<Production> {
     const query = ctx.client<Production>('productions')

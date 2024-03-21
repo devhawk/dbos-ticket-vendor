@@ -3,11 +3,15 @@
   "version": "0.0.1",
   "scripts": {
     "build": "tsc",
-    "openapi": "npx dbos-openapi generate src/operations.ts",
-    "test": "jest --randomize",
+    "openapi": "dbos-openapi generate src/operations.ts",
+    "test": "npm run db:reset && jest --randomize",
     "lint": "eslint src",
     "lint-fix": "eslint --fix src",
-    "start": "tsc && npx dbos-sdk start"
+    "start": "tsc && dbos-sdk start",
+    "db:rollback": "knex migrate:rollback",
+    "db:migrate": "knex migrate:latest",
+    "db:seed": "knex seed:run",
+    "db:reset": "npm run db:rollback && npm run db:migrate && npm run db:seed"
   },
   "devDependencies": {
     "@dbos-inc/communicator-bcrypt": "^1.1.14",
