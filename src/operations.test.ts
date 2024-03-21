@@ -66,9 +66,17 @@ describe("operations-test", () => {
     const performanceId = 1;
     const username = 'kate';
     const seats = [1, 3, 5];
+    const query = 'select * from reservations where "performanceId" = $1 and username = $2';
 
     try {
+      const before = await testRuntime.queryUserDB(query, performanceId, username);
+      expect(before).toHaveLength(0);
+
       await testRuntime.invoke(TicketVendor).reserveSeats(performanceId, username, seats);
+
+      const after = await testRuntime.queryUserDB(query, performanceId, username);
+      expect(after).toHaveLength(seats.length);
+
     } finally {
       await testRuntime.queryUserDB('DELETE FROM reservations WHERE username = $1', username);
     }
@@ -87,7 +95,7 @@ describe("operations-test", () => {
 
     try {
       const before = await testRuntime.queryUserDB(query, performanceId, username);
-      expect(before).toHaveLength(2);
+      expect(before).toHaveLength(seats.length);
 
       await testRuntime.invoke(TicketVendor).deleteReservation(performanceId, username, seats);
 
