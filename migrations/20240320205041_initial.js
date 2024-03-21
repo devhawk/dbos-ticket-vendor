@@ -15,7 +15,7 @@ exports.up = async function (knex) {
             table.increments('id');
             table.integer('productionId').notNullable().references('id').inTable('productions');
             table.string('description');
-            table.date('date').notNullable();
+            table.datetime('date').notNullable();
             table.decimal('ticketPrice').notNullable();
             table.integer('ticketCount').unsigned().notNullable();
         }).createTable('reservations', (table) => {
