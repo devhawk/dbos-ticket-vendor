@@ -4,7 +4,10 @@
 <p>{{production.description}}</p>
 <ul>
 {% for performance in performances %}
-    <li><a href="/production/{{production.id}}/{{performance.id}}">{{ performance.date | date: "%A %B %d, %Y at %I:%M %P" }}</a></li>
+    <li>
+        <a href="/production/{{production.id}}/{{performance.id}}">{{ performance.date | date: "%A %B %d, %Y at %I:%M %P" }}</a>
+        {{ performance.ticketCount | minus: performance.soldTicketCount }} tickets available
+    </li>
 {% endfor %}
 </ul>
 

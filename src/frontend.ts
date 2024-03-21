@@ -26,4 +26,11 @@ export class Frontend {
         const performances = await ctx.invoke(TicketVendor).getPerformances(id);
         return await render("production", { production, performances });
     }
+
+    @GetApi('/performance/:id')
+    static async performance(ctx: HandlerContext, @ArgSource(ArgSources.URL) id: number) {
+        const production = await ctx.invoke(TicketVendor).getPerformances(id);
+        const performances = await ctx.invoke(TicketVendor).getPerformances(id);
+        return await render("production", { production, performances });
+    }
 }  
