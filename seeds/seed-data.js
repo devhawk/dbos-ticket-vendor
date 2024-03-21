@@ -1,3 +1,7 @@
+// use a pseudo random number generator for reproducibility
+const seedrandom = require('seedrandom');
+const rng = seedrandom('seed');
+
 const productions = [
   {
     "id": 1,
@@ -44,14 +48,32 @@ const password = "$2a$10$mDzjkw/hqB1ZqI1/.MJ6e.wnsYTVH9THq1ilUbV/N6FK4Ye.BMrXu"
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> } 
  */
-exports.seed = async function(knex) {
-  
+exports.seed = async function (knex) {
+
   await knex('customers').insert(users.map(username => ({ username, password })));
   await knex('productions').insert(productions);
 
   for (const { id } of productions) {
     for (const perf of performances) {
-      await knex('performances').insert({ productionId: id, ...perf });
+      const performanceIds = await knex('performances').insert({ productionId: id, ...perf }, 'id');
+      if (performanceIds.length !== 1) { throw new Error(`Expected exactly one performance ID not ${performanceIds.length}`); }
+      const performanceId = performanceIds[0].id;
+
+      const seatSet = new Set();
+      const soldTicketCount = Math.floor(rng() * perf.ticketCount);
+      console.log(`Performance ${performanceId} for production ${id} has ${soldTicketCount} sold tickets`);
+      for (let i = 0; i < soldTicketCount; i++) {
+        const username = users[Math.floor(rng() * users.length)];
+        while (true) {
+          const seatNumber = Math.floor(rng() * perf.ticketCount) + 1;
+          if (!seatSet.has(seatNumber)) {
+            seatSet.add(seatNumber);
+            console.log(`Reserving seat ${seatNumber} of ${performanceId} for ${username}`);
+            await knex('reservations').insert({ performanceId, username, seatNumber });
+            break;
+          }
+        }
+      }
     }
   }
 };
