@@ -38,11 +38,10 @@ export class TicketVendor {
 
   @PostApi('/api/login')
   @Transaction({ readOnly: true })
-  static async login(ctx: TransactionContext<Knex>, username: string, password: string): Promise<void> {
+  static async login(ctx: TransactionContext<Knex>, username: string, password: string): Promise<boolean> {
     const user = await ctx.client<Customer>('customers').select("password").where({ username }).first();
-    if (!(user && await BcryptCommunicator.bcryptCompare(password, user.password))) {
-      throw new DBOSResponseError("Invalid username or password", 400);
-    }
+    if (!user) { return false; }
+    return await BcryptCommunicator.bcryptCompare(password, user.password);
   }
 
   @PostApi('/api/register')

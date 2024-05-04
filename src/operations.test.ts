@@ -12,10 +12,19 @@ describe("operations-test", () => {
     await testRuntime.destroy();
   });
 
-  test("login", async () => {
-    await testRuntime.invoke(TicketVendor).login('alice', 'password');
-    expect(() => testRuntime.invoke(TicketVendor).login('alice', 'incorrect-password')).rejects.toThrow();
-    expect(() => testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password')).rejects.toThrow();
+  describe("login", () => {
+    test("valid user/password", async () => {
+      const alice1 = await testRuntime.invoke(TicketVendor).login('alice', 'password');
+      expect(alice1).toBeTruthy();
+    });
+    test("invalid password", async () => {
+      const alice2 = await testRuntime.invoke(TicketVendor).login('alice', 'incorrect-password');
+      expect(alice2).toBeFalsy();
+    });
+    test("invalid user", async () => {
+      const zed1 = await testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password');
+      expect(zed1).toBeFalsy();
+    });
   });
 
   test("getProductions", async () => {
