@@ -3,7 +3,7 @@ import { BcryptCommunicator } from '@dbos-inc/communicator-bcrypt';
 import { Knex } from 'knex';
 import { Frontend } from './frontend';
 
-export { Frontend };
+export { Frontend, BcryptCommunicator };
 
 export interface Customer {
   username: string;
@@ -83,14 +83,15 @@ export class TicketVendor {
   @Transaction({ readOnly: true })
   static async getPerformances(ctx: TransactionContext<Knex>, @ArgSource(ArgSources.URL) productionId: number): Promise<PerformanceWithSoldTicketCount[]> {
     const query = ctx.client<Performance>('performances')
-      .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount', ctx.client.raw('COUNT(reservations.*)::integer as "soldTicketCount"'))
-      .where('productionId', productionId)
+      .select('id', 'productionId', 'description', 'date', 'ticketPrice', 'ticketCount')
+      .where({ productionId })
       .leftJoin<Reservation>('reservations', 'id', 'performanceId')
+      .column({ soldTicketCount: ctx.client.raw('COUNT(reservations.*)::integer', []) })
       .groupBy('id');
 
+    //ctx.logger.info(`getPerformances query: ${query.toSQL().toNative().sql}`)
     const results = await query;
-    // Knex type inference logic doesn't handle the raw COUNT() expression, so explicitly cast the results 
-    return results as unknown as PerformanceWithSoldTicketCount[];
+    return results;
   }
 
   @Transaction({ readOnly: true })
