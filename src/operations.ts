@@ -53,11 +53,11 @@ export class TicketVendor {
 
   @Transaction()
   static async saveNewUser(ctx: TransactionContext<Knex>, username: string, hashedPassword: string): Promise<void> {
-    const user = await ctx.client<Customer>('customers').select().where({ username }).first();
-    if (user) {
-      throw new DBOSResponseError("Username already exists", 400);
+    try {
+      await ctx.client<Customer>('customers').insert({ username, password: hashedPassword });
+    } catch {
+      throw new DBOSResponseError(`Username ${username} already exists`, 400);
     }
-    await ctx.client<Customer>('customers').insert({ username, password: hashedPassword });
   }
 
   @GetApi('/api/productions')

@@ -1,11 +1,13 @@
 import { TestingRuntime, createTestingRuntime } from "@dbos-inc/dbos-sdk";
 import { TicketVendor } from "./operations";
+import { BcryptCommunicator } from "@dbos-inc/communicator-bcrypt";
+import { randomBytes } from "node:crypto";
 
 describe("operations-test", () => {
   let testRuntime: TestingRuntime;
 
   beforeAll(async () => {
-    testRuntime = await createTestingRuntime([TicketVendor]);
+    testRuntime = await createTestingRuntime([TicketVendor, BcryptCommunicator]);
   });
 
   afterAll(async () => {
@@ -24,6 +26,27 @@ describe("operations-test", () => {
     test("invalid user", async () => {
       const zed1 = await testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password');
       expect(zed1).toBeFalsy();
+    });
+  });
+
+  describe("register", () => {
+    test("new user", async () => {
+      const customer = "zed" + randomBytes(5).toString('hex');
+      const password = "password";
+
+      const customer1 = await testRuntime.invoke(TicketVendor).login(customer, password);
+      expect(customer1).toBeFalsy();
+
+      const handle = await testRuntime.invoke(TicketVendor).register(customer, password);
+      await handle.getResult();
+
+      const customer2 = await testRuntime.invoke(TicketVendor).login(customer, password);
+      expect(customer2).toBeTruthy();
+    }, 30000);
+
+    test("existing user", async () => {
+      const handle = await testRuntime.invoke(TicketVendor).register("alice", "new-password");
+      await expect(handle.getResult()).rejects.toThrow("Username alice already exists");
     });
   });
 
