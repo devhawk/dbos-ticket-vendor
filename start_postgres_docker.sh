@@ -21,4 +21,6 @@ for i in {1..30}; do
 done
 
 docker exec dbos-db psql -U postgres -c "CREATE DATABASE ticket_vendor;"
+npx dbos migrate
+npm run db:seed
 echo "Database started successfully!"

@@ -28,11 +28,11 @@ const soldTickets = {
     { seatNumber: 2, username: 'irene' },
     { seatNumber: 10, username: 'frank' },
     { seatNumber: 6, username: 'bob' },
-    { seatNumber: 8, username: 'alice' },
+    { seatNumber: 8, username: 'alex' },
     { seatNumber: 4, username: 'irene' },
   ],
   "3": [
-    { seatNumber: 8, username: 'alice' },
+    { seatNumber: 8, username: 'alex' },
     { seatNumber: 2, username: 'ethan' },
     { seatNumber: 5, username: 'ethan' },
     { seatNumber: 7, username: 'frank' },
@@ -50,26 +50,26 @@ const soldTickets = {
   "5": [
     { seatNumber: 2, username: 'irene' },
     { seatNumber: 5, username: 'frank' },
-    { seatNumber: 10, username: 'alice' },
+    { seatNumber: 10, username: 'alex' },
     { seatNumber: 6, username: 'frank' },
-    { seatNumber: 9, username: 'colin' },
+    { seatNumber: 9, username: 'chuck' },
     { seatNumber: 1, username: 'harry' },
     { seatNumber: 7, username: 'harry' },
   ],
   "6": [
-    { seatNumber: 4, username: 'colin' },
+    { seatNumber: 4, username: 'chuck' },
     { seatNumber: 8, username: 'frank' },
   ],
   "7": [
-    { seatNumber: 9, username: 'alice' },
+    { seatNumber: 9, username: 'alex' },
     { seatNumber: 6, username: 'bob' },
     { seatNumber: 7, username: 'jacob' },
-    { seatNumber: 8, username: 'colin' },
+    { seatNumber: 8, username: 'chuck' },
   ],
   "8": [
     { seatNumber: 9, username: 'jacob' },
     { seatNumber: 1, username: 'bob' },
-    { seatNumber: 5, username: 'alice' },
+    { seatNumber: 5, username: 'alex' },
   ],
   "9": [
     { seatNumber: 7, username: 'harry' },
@@ -87,15 +87,15 @@ const soldTickets = {
   ],
   "11": [
     { seatNumber: 8, username: 'ethan' },
-    { seatNumber: 10, username: 'colin' },
-    { seatNumber: 7, username: 'colin' },
+    { seatNumber: 10, username: 'chuck' },
+    { seatNumber: 7, username: 'chuck' },
     { seatNumber: 2, username: 'irene' },
     { seatNumber: 6, username: 'david' },
   ],
   "12": [
     { seatNumber: 1, username: 'jacob' },
     { seatNumber: 2, username: 'frank' },
-    { seatNumber: 3, username: 'colin' },
+    { seatNumber: 3, username: 'chuck' },
     { seatNumber: 4, username: 'jacob' },
     { seatNumber: 5, username: 'jacob' },
     { seatNumber: 6, username: 'jacob' },
@@ -107,9 +107,9 @@ const soldTickets = {
 }
 
 const users = [
-  "alice",
+  "alex",
   "bob",
-  "colin",
+  "chuck",
   "david",
   "ethan",
   "frank",
