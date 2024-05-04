@@ -13,8 +13,8 @@ describe("operations-test", () => {
   });
 
   test("login", async () => {
-    await testRuntime.invoke(TicketVendor).login('alice', 'password');
-    expect(() => testRuntime.invoke(TicketVendor).login('alice', 'incorrect-password')).rejects.toThrow();
+    await testRuntime.invoke(TicketVendor).login('alex', 'password');
+    expect(() => testRuntime.invoke(TicketVendor).login('alex', 'incorrect-password')).rejects.toThrow();
     expect(() => testRuntime.invoke(TicketVendor).login('zed', 'incorrect-password')).rejects.toThrow();
   });
 
